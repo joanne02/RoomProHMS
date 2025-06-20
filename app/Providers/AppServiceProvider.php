@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,6 +36,10 @@ class AppServiceProvider extends ServiceProvider
         //         require $breadcrumbsFile;
         //     }
 
+
+        if (env('APP_ENV') === 'production') {
+            URL::forceScheme('https');
+        }
 
         View::composer('*', function ($view) {
             $notificationCount = Auth::check() ? Auth::user()->unreadNotifications->count() : 0;
