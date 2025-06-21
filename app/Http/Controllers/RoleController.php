@@ -117,4 +117,37 @@ class RoleController extends Controller
         return redirect()->route('adminroles.index')->with($notification);
     }
 
+    public function destroy($id)
+    {
+        $role = Role::findOrFail($id);
+
+        // Detach role from all users
+        $users = User::whereHas('roles', function ($query) use ($role) {
+            $query->where('roles.id', $role->id);
+        })->get();
+
+        foreach ($users as $user) {
+            Bouncer::retract($role)->from($user);
+        }
+
+        // Delete all permissions assigned to the role
+        DB::table('permissions')
+            ->where('entity_id', $role->id)
+            ->where('entity_type', 'roles')
+            ->delete();
+
+        // Delete assigned_roles entries
+        DB::table('assigned_roles')
+            ->where('role_id', $role->id)
+            ->delete();
+
+        // Delete the role itself
+        $role->delete();
+
+        return redirect()->route('adminroles.index')->with([
+            'message' => 'Role deleted successfully.',
+            'alert-type' => 'success',
+        ]);
+    }
+    
 }

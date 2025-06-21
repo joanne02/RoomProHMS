@@ -117,12 +117,12 @@
                         </div><!-- Row -->
 
                         <div class="row">
-                            <div class="col-sm-6">
+                            {{-- <div class="col-sm-6">
                                 <a href="{{ route('viewqr') }}" class="btn btn-secondary">
                                     Download QR Code
                                 </a>                                                              
-                            </div>
-                            <div class="col-sm-6 d-flex justify-content-end gap-2">
+                            </div> --}}
+                            <div class="col-sm-12 d-flex justify-content-end gap-2">
                                 <button type="submit" class="btn btn-primary submit">Submit</button>
                                 <a href="{{ route('mainvisitation') }}" class="btn btn-secondary">Cancel</a>
                             </div>

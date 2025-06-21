@@ -50,7 +50,7 @@
                                 {{-- <td>{{$complaint->room_id}}</td> --}}
                                 <td>{{$complaint->type}}</td>
                                 <td>{{ ucwords(str_replace('_', ' ', $complaint->status)) }}</td>
-                                <td><a href="{{route('editcomplaint',$complaint->id)}}" class="btn btn-sm btn-primary">Edit</i></a> 
+                                <td><a href="{{route('editcomplaint',$complaint->id)}}" class="btn btn-sm btn-primary">Response</i></a> 
                                     {{-- <a href="{{route('editapplication',$room->id)}}"><i class="link-icon" data-feather="edit"></i></a> --}}
                                     <a href="{{route('deletecomplaint',$complaint->id)}}" class="btn btn-sm btn-danger" id="delete">Delete</a></td>
                             </tr>

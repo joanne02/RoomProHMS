@@ -3,5 +3,5 @@
 </svg> --}}
 <div class="text-center mb-6">
     <!-- Image -->
-    <img src="{{ asset('storage/images/logo.png') }}" alt="RoomPro Logo" class="mx-auto mb-4 h-20">
+    <img src="{{ asset('storage/images/logo.png') }}" alt="RoomPro Logo" class="mx-auto h-20 w-auto max-w-full">
 </div>

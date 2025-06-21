@@ -81,27 +81,83 @@
                         </div>
                     </div>
                     {{-- Action Buttons --}}
+                    
+
                     <div class="d-flex justify-content-end gap-2">
+                        @can('update_complaint')
                         @if($complaint->status === 'pending')
                             <form method="POST" action="{{ route('receivecomplaint', $complaint->id) }}">
                                 @csrf
-                                <button type="submit" class="btn btn-warning">Complaint Received</button>
+                                <!-- Button to open Complaint Received confirmation modal -->
+                            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#confirmReceiveModal">
+                                Complaint Received
+                            </button>
+
                             </form>
                         @elseif($complaint->status === 'in_progress')
                             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#responseModal">Response</button>
 
                             <form method="POST" action="{{ route('completecomplaint', $complaint->id) }}">
                                 @csrf
-                                <button type="submit" class="btn btn-success">Complete</button>
+                                <!-- Button to open Complaint Received confirmation modal -->
+                                <!-- Button to open confirmation modal -->
+                                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmCompleteModal">
+                                    Complete
+                                </button>
+
                             </form>
                         @endif
-
+                            @endcan
                         <a href="{{ route('indexcomplaint') }}" class="btn btn-secondary">Back</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Confirm Complaint Received Modal -->
+<div class="modal fade" id="confirmReceiveModal" tabindex="-1" aria-labelledby="confirmReceiveModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" action="{{ route('receivecomplaint', $complaint->id) }}">
+        @csrf
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmReceiveModalLabel">Confirm Complaint Receipt</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to mark this complaint as <strong>Received</strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-warning">Yes, Mark as Received</button>
+            </div>
+        </div>
+    </form>
+  </div>
+</div>
+
+<!-- Confirm Complete Modal -->
+<div class="modal fade" id="confirmCompleteModal" tabindex="-1" aria-labelledby="confirmCompleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" action="{{ route('completecomplaint', $complaint->id) }}">
+        @csrf
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmCompleteModalLabel">Confirm Completion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to mark this complaint as <strong>Completed</strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-success">Yes, Complete</button>
+            </div>
+        </div>
+    </form>
+  </div>
+</div>
 
     {{-- Timeline --}}
     <div class="row mt-3">

@@ -338,7 +338,11 @@
                             @can('accept_application')
                             @if($application->acceptance === 'pending' && !$isSessionExpired)
                                 <div class='d-flex justify-content-end gap-2'>
-                                    <button type="submit" class="btn btn-primary submit">Accept</button>
+                                    <!-- Accept button triggers modal -->
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#acceptConfirmationModal">
+                                        Accept
+                                    </button>
+
                                     <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectAcceptanceModal">Reject</button>
                                 </div>
                             @endif
@@ -349,6 +353,34 @@
                 </form>
             </div>
         </div>
+
+        <!-- Accept Confirmation Modal -->
+        <div class="modal fade" id="acceptConfirmationModal" tabindex="-1" aria-labelledby="acceptConfirmationLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form method="POST" action="{{ route('updateacceptancestatus', $application->id) }}">
+                        @csrf
+                        <input type="hidden" name="acceptance_status" value="accepted">
+                        <input type="hidden" name="id" value="{{ $application->id }}">
+
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="acceptConfirmationLabel">Confirm Acceptance</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            Are you sure you want to accept this hostel offer?
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Yes, Accept</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
 
         <!-- Rejection Modal -->
         <div class="modal fade" id="rejectAcceptanceModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">

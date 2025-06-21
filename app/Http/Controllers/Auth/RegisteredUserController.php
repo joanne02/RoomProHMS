@@ -36,12 +36,11 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => [
                 'required',
-                'string',
                 'email',
-                'max:255',
                 'unique:users,email',
-                'regex:/^[a-zA-Z0-9._%+-]+@unimas\.my$/'
+                'regex:/^[a-zA-Z0-9._%+-]+@(siswa\.)?unimas\.my$/',
             ],
+
             'user_id' => ['required', 'string', 'max:20', 'unique:users,user_id'],
             'password' => [
                 'required',

@@ -38,11 +38,18 @@
                         <div>
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <h5 class="card-title mb-0">Batch {{ $chunkNumber }}</h5>
-                                @if ($status && $status->is_confirmed)
-                                    <span class="badge bg-success">Completed</span>
+                                @if ($status)
+                                    @if ($status->is_confirmed)
+                                        <span class="badge bg-success">Completed</span>
+                                    @elseif ($status->is_running)
+                                        <span class="badge bg-primary">Running</span>
+                                    @else
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    @endif
                                 @else
-                                    <span class="badge bg-warning text-dark">Pending</span>
+                                    <span class="badge bg-secondary">No Status</span>
                                 @endif
+
                             </div>
                             <p class="mb-2 text-muted fs-5">
                                 Applications in this batch:
