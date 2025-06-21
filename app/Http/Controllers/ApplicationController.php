@@ -89,11 +89,23 @@ class ApplicationController extends Controller
         ->where('user_id', $user->id)
         ->exists();
 
+        $matchPercentages = AllocationStatus::where('session_id', $session_id->id)
+        ->pluck('overall_match_percentage','chunk_number');
 
-        $matchPercentages = AllocationStatus::where('session_id', $session_id->id ?? null)
-        ->pluck('overall_match_percentage', 'chunk_number'); // ['chunk_number' => percentage]
+        $overallMatchPercentage = $matchPercentages->count() > 0
+        ? round($matchPercentages->avg(), 2) // e.g., 83.45
+        : null;
 
-        return view('application.main_application', compact('applications', 'active_session_id', 'session_id', 'hasAcceptOffer', 'hasApplied','totalAvailableSeat', 'matchPercentages'));
+        return view('application.main_application', compact(
+            'applications',
+            'active_session_id',
+            'session_id',
+            'hasAcceptOffer',
+            'hasApplied',
+            'totalAvailableSeat',
+            'matchPercentages',
+            'overallMatchPercentage'
+        ));
     
         abort(403, 'Unauthorized action.');
     } 
@@ -339,11 +351,14 @@ class ApplicationController extends Controller
         $session_id = ApplicationSession::findOrFail($id);
         $chunks = $applications->chunk(50); // Chunk applications for pagination
 
-        // ✅ Retrieve all statuses for this session, grouped by chunk number
+        // Retrieve all statuses for this session, grouped by chunk number
         $statuses = AllocationStatus::where('session_id', $id)->get()->keyBy('chunk_number');
 
+        $matchPercentages = AllocationStatus::where('session_id', $session_id->id)
+            ->pluck('overall_match_percentage','chunk_number');
+
         // Return the view and pass the approved applications + statuses
-        return view('application.main_room_allocation', compact('applications', 'session_id', 'chunks', 'statuses'));
+        return view('application.main_room_allocation', compact('applications', 'session_id', 'chunks', 'statuses', 'matchPercentages'));
     }
 
     public function roomAllocationBatch($session_id, $chunk_index)
@@ -378,8 +393,6 @@ class ApplicationController extends Controller
             'status' // ✅ pass to view
         ));
     }
-
-
 
     // public function runRoomAllocationGA()
     // {

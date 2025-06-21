@@ -13,7 +13,7 @@ class ResidentController extends Controller
 {
     public function indexResident()
     {
-        $semesters = Semester::all();
+        $semesters = Semester::orderBy('created_at', 'desc')->get();
         $residents = Resident::all();
         return view('resident.index_resident',compact('semesters','residents'));
     }

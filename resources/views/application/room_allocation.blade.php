@@ -19,7 +19,7 @@
 
     {{-- Match percentage alert --}}
     @if ($status && $status->overall_match_percentage !== null)
-        <div class="alert alert-info mt-3 col-md-6">
+        <div class="alert alert-info mt-3 col-md-12">
             Latest Allocation Match: {{ $status->overall_match_percentage }}%
         </div>
     @endif

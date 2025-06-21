@@ -26,41 +26,69 @@
 
         {{-- Batch Cards --}}
         @foreach($chunks as $index => $chunk)
-    @php
-        $chunkNumber = $index + 1;
-        $status = $statuses[$chunkNumber] ?? null;
-    @endphp
+            @php
+                $chunkNumber = $index + 1;
+                $status = $statuses[$chunkNumber] ?? null;
+                $matchPercentage = $matchPercentages->get($chunkNumber, null);
+            @endphp
 
-    <div class="example room_allocation_card mb-3 border-primary">
-        <div class="card-body">
-            <div class="d-flex align-items-start">
-                <div class="col-12 p-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="mb-2 me-auto">Batch {{ $chunkNumber }}</h4>
+            <div class="col-md-12 mb-3">
+                <div class="card border shadow-sm h-100 room_allocation_card">
+                    <div class="card-body d-flex flex-column justify-content-between">
                         <div>
-                            @if ($status && $status->is_confirmed)
-                                <a href="{{ route('roomallocationbatch', ['session_id' => $session_id->id, 'chunk_index' => $chunkNumber]) }}"
-                                   class="btn btn-sm btn-info">
-                                    Completed
-                                </a>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="card-title mb-0">Batch {{ $chunkNumber }}</h5>
+                                @if ($status && $status->is_confirmed)
+                                    <span class="badge bg-success">Completed</span>
+                                @else
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                @endif
+                            </div>
+                            <p class="mb-2 text-muted fs-5">
+                                Applications in this batch:
+                                <span class="fw-bold text-info fs-3">{{ $chunk->count() }}</span>
+                            </p>
+
+                            {{-- Show status if available --}}      
+
+                            {{-- Show percentage if available --}}
+                            @if (!is_null($matchPercentage))
+                                        <div class="mb-2">
+                                            <p class="mb-1 fs-5">Match Percentage:</p>
+                                            <div class="progress" style="height: 24px;">
+                                                <div class="progress-bar 
+                                                            @if($matchPercentage >= 80)
+                                                                bg-success
+                                                            @elseif($matchPercentage >= 50)
+                                                                bg-info
+                                                            @elseif($matchPercentage >= 30)
+                                                                bg-warning
+                                                            @else
+                                                                bg-danger
+                                                            @endif"
+                                                    role="progressbar"
+                                                    style="width: {{ $matchPercentage }}%; font-size: 1rem;"
+                                                    aria-valuenow="{{ $matchPercentage }}"
+                                                    aria-valuemin="0" aria-valuemax="100">
+                                                    {{ $matchPercentage }}%
+                                                </div>
+                                            </div>
+                                        </div>
                             @else
-                                <a href="{{ route('roomallocationbatch', ['session_id' => $session_id->id, 'chunk_index' => $chunkNumber]) }}"
-                                   class="btn btn-sm btn-info">
-                                    Process
-                                </a>
+                                <p class="text-muted fst-italic fs-5">Match percentage not available</p>
                             @endif
                         </div>
-                    </div>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="fs-5 text-secondary">Applications in this batch:</span>
-                        <span class="fs-2 fw-bold">{{ $chunk->count() }}</span>
+
+                        <div class="mt-auto text-end">
+                            <a href="{{ route('roomallocationbatch', ['session_id' => $session_id->id, 'chunk_index' => $chunkNumber]) }}"
+                            class="btn btn-sm btn-outline-primary">
+                                {{ $status && $status->is_confirmed ? 'View Details' : 'Start Allocation' }}
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-@endforeach
-
+        @endforeach
     </div>
 </div>
 

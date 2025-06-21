@@ -140,116 +140,129 @@
         </div> --}}
 
         @can('allocate_room')
-        <div class="row">
-            <div class="col-md-6 grid-margin stretch-card">
-                <a href="{{ isset($session_id) ? route('roomallocation', ['id' => $session_id->id]) : '#' }}"
-                class="text-decoration-none w-100 {{ isset($session_id) ? '' : 'disabled' }}">
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-title mb-3">
-                            Total Number Of Approved Application
-                        </h6>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h3 class="fw-bold text-primary mb-0">
-                                {{ $applications->where('application_status', 'approved')->count() }}
-                            </h3>
-                            @if (!empty($matchPercentages))
-                                <div class="text-end ms-3">
-                                    @foreach ($matchPercentages as $chunk => $percent)
-                                        <div class="text-muted small">Chunk {{ $chunk }}: {{ $percent }}%</div>
-                                    @endforeach
-                                </div>
+            <div class="row">
+    {{-- 1. Approved Applications --}}
+                <div class="col-md-5 grid-margin stretch-card">
+                    <a href="{{ isset($session_id) ? route('roomallocation', ['id' => $session_id->id]) : '#' }}"
+                    class="text-decoration-none w-100 {{ isset($session_id) ? '' : 'disabled' }}">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title mb-3">
+                                    Total Number Of Approved Application
+                                </h6>
+                                <h3 class="fw-bold text-primary mb-0">
+                                    {{ $applications->where('application_status', 'approved')->count() }}
+                                </h3>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                {{-- 2. Overall Match Percentage --}}
+                <div class="col-md-4 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title mb-3">
+                                Overall Match Percentage
+                            </h6>
+                            @if ($overallMatchPercentage !== null)
+                                <h3 class="fw-bold text-success mb-0">
+                                    {{ $overallMatchPercentage }}%
+                                </h3>
+                            @elseif ($overallMatchPercentage === 0)
+                                <h5 class="text-danger">No match found</h5>
+                            @else
+                                <h5 class="text-muted">N/A</h5>
                             @endif
                         </div>
                     </div>
                 </div>
-                </a>
-            </div>
 
-                    <div class="col-md-6 grid-margin stretch-card">
-                        <div class="card">
-                            <div class="card-body">
-                                <h6 class="card-title mb-3">
-                                        Total Available Seat
-                                </h6>
-                                <h3 class="fw-bold text-primary">
-                                    {{ $totalAvailableSeat ?? 0}} 
-                                </h3>
-                            </div>
+                {{-- 3. Total Available Seat --}}
+                <div class="col-md-3 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title mb-3">
+                                Total Available Seat
+                            </h6>
+                            <h3 class="fw-bold text-primary mb-0">
+                                {{ $totalAvailableSeat ?? 0 }}
+                            </h3>
                         </div>
                     </div>
                 </div>
-                @endcan
+            </div>
+        @endcan
 
-        <div class="row">
-            <div class="col-md-12 grid-margin stretch-card">
-                <div class="card">
-                <div class="card-body">
-                    <h6 class="card-title mb-3">Application</h6>
-                
-                    <div class="table-responsive">
-                        <table id="dataTableExample" class="table">
-                            <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Name</th>
-                                <th>Student ID</th>
-                                <th>Faculty</th>
-                                <th>Program</th>
-                                <th>Year</th>
-                                <th>Application Status</th>
-                                <th>Acceptance</th>
-                                <th>Action</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($applications as $key => $application) 
-                            <tr>
-                                <td>{{$key+1}}</td>
-                                <td>{{$application->name}}</td>
-                                <td>{{$application->student_id}}</td>
-                                <td>{{$application->faculty}}</td>
-                                <td>{{ ucwords(str_replace('_', ' ', $application->program)) }}</td>
-                                <td>{{$application->year_of_study}}</td>
-                                <td>{{ ucwords(str_replace('_', ' ', $application->application_status)) }}</td>
-                                <td>{{ ucwords(str_replace('_', ' ', $application->acceptance)) }}</td>
-                                <td>
-                                    {{-- <a href="{{route('viewapplication',$application->id)}}"><i class="link-icon" data-feather="eye"></i></a> 
-                                    <a href="{{route('deleteapplication',$application->id)}}" class="text-primary me-2" id="delete"><i data-feather="trash"></i></a> --}}
-                                {{-- If acceptance is empty or pending, show "Accept Offer" button --}}
-                                    @if($application->application_status === 'pending')
-                                        <!-- Approval still pending: show View -->
-                                        <a href="{{ route('viewapplication', $application->id) }}" class="btn btn-sm btn-primary">
-                                            View Status
-                                        </a>
-                                    @elseif($application->application_status === 'approved' && $application->acceptance === 'pending')
-                                        <!-- Approval approved and acceptance pending: show Accept Offer -->
-                                        <a href="{{ route('viewapplication', $application->id) }}" class="btn btn-sm btn-primary">
-                                            Accept Offer
-                                        </a>
-                                    @else
-                                        <!-- Acceptance is not pending (approved/accepted/rejected/whatever): show View -->
-                                        <a href="{{ route('viewapplication', $application->id) }}" class="btn btn-sm btn-primary">
-                                            View
-                                        </a>
-                                    @endif
+            <div class="row">
+                <div class="col-md-12 grid-margin stretch-card">
+                    <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title mb-3">Application</h6>
+                    
+                        <div class="table-responsive">
+                            <table id="dataTableExample" class="table">
+                                <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Name</th>
+                                    <th>Student ID</th>
+                                    <th>Faculty</th>
+                                    <th>Program</th>
+                                    <th>Year</th>
+                                    <th>Application Status</th>
+                                    <th>Acceptance</th>
+                                    <th>Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach($applications as $key => $application) 
+                                <tr>
+                                    <td>{{$key+1}}</td>
+                                    <td>{{$application->name}}</td>
+                                    <td>{{$application->student_id}}</td>
+                                    <td>{{$application->faculty}}</td>
+                                    <td>{{ ucwords(str_replace('_', ' ', $application->program)) }}</td>
+                                    <td>{{$application->year_of_study}}</td>
+                                    <td>{{ ucwords(str_replace('_', ' ', $application->application_status)) }}</td>
+                                    <td>{{ ucwords(str_replace('_', ' ', $application->acceptance)) }}</td>
+                                    <td>
+                                        {{-- <a href="{{route('viewapplication',$application->id)}}"><i class="link-icon" data-feather="eye"></i></a> 
+                                        <a href="{{route('deleteapplication',$application->id)}}" class="text-primary me-2" id="delete"><i data-feather="trash"></i></a> --}}
+                                    {{-- If acceptance is empty or pending, show "Accept Offer" button --}}
+                                        @if($application->application_status === 'pending')
+                                            <!-- Approval still pending: show View -->
+                                            <a href="{{ route('viewapplication', $application->id) }}" class="btn btn-sm btn-primary">
+                                                View Status
+                                            </a>
+                                        @elseif($application->application_status === 'approved' && $application->acceptance === 'pending')
+                                            <!-- Approval approved and acceptance pending: show Accept Offer -->
+                                            <a href="{{ route('viewapplication', $application->id) }}" class="btn btn-sm btn-primary">
+                                                Accept Offer
+                                            </a>
+                                        @else
+                                            <!-- Acceptance is not pending (approved/accepted/rejected/whatever): show View -->
+                                            <a href="{{ route('viewapplication', $application->id) }}" class="btn btn-sm btn-primary">
+                                                View
+                                            </a>
+                                        @endif
 
-                                    @can('delete_application')
-                                    {{-- Optionally keep delete icon if you want --}}
-                                    <a href="{{route('downloadapplicationpdf' ,$application->id)}}" class="btn btn-sm btn-secondary">Dowbload</a>
-                                    <a href="{{route('deleteapplication',$application->id)}}" class="btn btn-sm btn-danger" id="delete">Delete</a>
-                                    @endcan
-                                </td>
-                                    
-                            </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
+                                        @can('delete_application')
+                                        {{-- Optionally keep delete icon if you want --}}
+                                        <a href="{{route('downloadapplicationpdf' ,$application->id)}}" class="btn btn-sm btn-secondary">Dowbload</a>
+                                        <a href="{{route('deleteapplication',$application->id)}}" class="btn btn-sm btn-danger" id="delete">Delete</a>
+                                        @endcan
+                                    </td>
+                                        
+                                </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                     </div>
                 </div>
-                </div>
             </div>
-        </div>
 </div>
 @endsection
 
