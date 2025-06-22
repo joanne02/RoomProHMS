@@ -206,6 +206,10 @@
                     <p>{{ $notificationCount }} New Notifications</p>
                     <a href="{{ route('notifications.clear') }}" class="text-muted">Clear all</a>
                 </div>
+                <div class="text-center py-2 border-top">
+                  <a href="{{route('notifications.index')}}" class="text-primary">View All Notifications</a>
+                </div>
+
 
                 @if($notifications->count())
                     @foreach($notifications as $notification)

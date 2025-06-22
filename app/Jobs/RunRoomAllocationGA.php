@@ -25,7 +25,7 @@ class RunRoomAllocationGA implements ShouldQueue
 
     public function __construct($sessionId, $chunkNumber = null, User $triggeredBy)
     {
-        Log::info("👷 Constructor called with session ID: {$sessionId}");
+        Log::info("Constructor called with session ID: {$sessionId}");
         $this->sessionId = $sessionId;
         $this->chunkNumber = $chunkNumber;
         $this->triggeredBy = $triggeredBy;
@@ -35,9 +35,9 @@ class RunRoomAllocationGA implements ShouldQueue
     {
         $start = microtime(true);
         if ($this->chunkNumber !== null) {
-        Log::info("🚀 Starting Room Allocation GA for session: {$this->sessionId}, chunk: {$this->chunkNumber}");
+        Log::info("Starting Room Allocation GA for session: {$this->sessionId}, chunk: {$this->chunkNumber}");
         } else {
-            Log::warning("⚠️ No chunk number provided for session: {$this->sessionId} (chunk is null)");
+            Log::warning("No chunk number provided for session: {$this->sessionId} (chunk is null)");
         }
 
         try {
@@ -57,18 +57,18 @@ class RunRoomAllocationGA implements ShouldQueue
                 ->values();
 
             if ($applications->isEmpty()) {
-                Log::warning("⚠️ No applications for session {$this->sessionId}, chunk {$this->chunkNumber}");
+                Log::warning("No applications for session {$this->sessionId}, chunk {$this->chunkNumber}");
                 return;
             }
 
             $rooms = Room::where('status', 'available')->get();
 
             if ($rooms->isEmpty()) {
-                Log::warning("⚠️ No available rooms for session {$this->sessionId}");
+                Log::warning("No available rooms for session {$this->sessionId}");
                 return;
             }
 
-            Log::info("✅ Chunk {$this->chunkNumber}: Applications: {$applications->count()}, Rooms: {$rooms->count()}");
+            Log::info("Chunk {$this->chunkNumber}: Applications: {$applications->count()}, Rooms: {$rooms->count()}");
 
             $preferenceMap = $applications->mapWithKeys(fn($app) => [
                 $app->id => json_decode($app->preferred_room_feature, true) ?? [],
@@ -171,7 +171,6 @@ class RunRoomAllocationGA implements ShouldQueue
             }
 
             $overall = $matched > 0 ? round($totalMatch / $matched, 2) : 0;
-            // $status = AllocationStatus::firstOrNew(['session_id' => $this->sessionId]);
             $status = AllocationStatus::firstOrNew([
                 'session_id' => $this->sessionId,
                 'chunk_number' => $this->chunkNumber,
@@ -182,9 +181,9 @@ class RunRoomAllocationGA implements ShouldQueue
             $status->overall_match_percentage = $overall;
             $status->save();
 
-            Log::info("📝 Saved overall match percentage: {$overall}% for session: {$this->sessionId}");
+            Log::info("Saved overall match percentage: {$overall}% for session: {$this->sessionId}");
 
-            Log::info("✅ Chunk {$this->chunkNumber} completed. Match: {$overall}%");
+            Log::info("Chunk {$this->chunkNumber} completed. Match: {$overall}%");
 
             $this->triggeredBy->notify(
                 new RoomAllocationCompletedNotification(
@@ -198,14 +197,13 @@ class RunRoomAllocationGA implements ShouldQueue
 
 
         } catch (\Throwable $e) {
-            Log::error("❌ Job failed for session {$this->sessionId}, chunk {$this->chunkNumber}: {$e->getMessage()}");
+            Log::error("Job failed for session {$this->sessionId}, chunk {$this->chunkNumber}: {$e->getMessage()}");
             throw $e;
         } finally {
             $duration = round(microtime(true) - $start, 2);
-            Log::info("⏱ Chunk {$this->chunkNumber} for session {$this->sessionId} completed in {$duration} seconds.");
+            Log::info("Chunk {$this->chunkNumber} for session {$this->sessionId} completed in {$duration} seconds.");
         }
     }
-
 
     private function calculateFitness($chromosome, $applications, $rooms, $preferenceMap): int
     {
@@ -275,18 +273,17 @@ class RunRoomAllocationGA implements ShouldQueue
         Log::error("Room allocation job failed for session {$this->sessionId}: " . $exception->getMessage());
     }
 
-public function middleware(): array
-{
-    $key = "room-allocation-{$this->sessionId}";
+    public function middleware(): array
+    {
+        $key = "room-allocation-{$this->sessionId}";
 
-    if ($this->chunkNumber !== null) {
-        $key .= "-chunk-{$this->chunkNumber}";
+        if ($this->chunkNumber !== null) {
+            $key .= "-chunk-{$this->chunkNumber}";
+        }
+
+        return [
+            (new \Illuminate\Queue\Middleware\WithoutOverlapping($key))->expireAfter(60) // expire lock after 60 seconds
+        ];
     }
-
-    return [
-        (new \Illuminate\Queue\Middleware\WithoutOverlapping($key))->expireAfter(60) // expire lock after 60 seconds
-    ];
-}
-
 
 }

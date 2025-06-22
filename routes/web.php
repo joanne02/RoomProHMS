@@ -67,6 +67,19 @@ Route::get('/notifications/read/{id}', function ($id) {
     return redirect()->back();
 })->name('notifications.read');
 
+Route::get('/notifications', function () {
+    $daysLimit = 7;
+    $maxNotifications = 100;
+
+    $notifications = Auth::user()
+        ->notifications
+        ->where('created_at', '>=', now()->subDays($daysLimit))
+        ->sortByDesc('created_at')
+        ->take($maxNotifications);
+
+    return view('notification', compact('notifications', 'daysLimit'));
+})->name('notifications.index');
+
 
 Route::get('/dashboard', function () {
     

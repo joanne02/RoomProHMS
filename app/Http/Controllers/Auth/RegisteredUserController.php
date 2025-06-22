@@ -63,13 +63,15 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        Auth::login($user);
+        // Auth::login($user);
 
         $notification = [
             'type' => 'success',
             'message' => 'Registration successful! Welcome, ' . $user->username . '!',
         ];
 
-        return redirect(RouteServiceProvider::HOME)->with($notification);
+        return redirect()->route('login')->with($notification);
+
+        // return redirect(RouteServiceProvider::HOME)->with($notification);
     }
 }
