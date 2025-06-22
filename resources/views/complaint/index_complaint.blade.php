@@ -99,7 +99,9 @@
                                 <td>{{ucwords(str_replace('_', ' ', $complaint->type))}}</td>
                                 <td>{{ucwords(str_replace('_', ' ',$complaint->status))}}</td>
                                 <td><a href="{{route('viewcomplaint',$complaint->id)}}" class="btn btn-sm btn-info">View</a> 
+                                    @can('update_complaint')
                                     <a href="{{route('editcomplaint',$complaint->id)}}" class="btn btn-sm btn-primary">Response</a>
+                                    @endcan
                                     <a href="{{route('downloadcomplaintform',$complaint->id)}}" class="btn btn-sm btn-secondary">Download</a>
                                     <a href="{{route('deletecomplaint',$complaint->id)}}" class="btn btn-sm btn-danger" id="delete">Delete</a></td>
                             </tr>

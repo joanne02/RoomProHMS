@@ -42,10 +42,10 @@ class ResidentController extends Controller
             return redirect()->back()->with(['error', 'Your record is not part of the active semester.']);
         }
 
-        // ✅ Get the house_name from the logged-in user's room
+        //Get the house_name from the logged-in user's room
         $houseName = $userResident->room->house_name;
 
-        // ✅ Fetch all residents assigned to rooms in the same house_name during the active semester
+        //Fetch all residents assigned to rooms in the same house_name during the active semester
         $residents = Resident::where('semester_id', $activeSemester->id)
             ->whereHas('room', function ($query) use ($houseName) {
                 $query->where('house_name', $houseName);
