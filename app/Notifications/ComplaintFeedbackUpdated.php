@@ -43,7 +43,7 @@ class ComplaintFeedbackUpdated extends Notification
                     ->greeting('Hi ' . $notifiable->username . ',')
                     ->line('There is a new update on your complaint.')
                     ->line('You can view the latest feedback now.')
-                    ->action('View Complaint Update', route('viewcomplaint', ['id' => $this->complaint->id]))
+                    // ->action('View Complaint Update', route('viewcomplaint', ['id' => $this->complaint->id]))
                     ->line('Thank you!');
     }
 
