@@ -85,7 +85,7 @@ class ComplaintController extends Controller
 
         $adminEmail = 'admin@example.com'; // change this to actual admin email
         Notification::send($staffUsers, new NewComplaintsEntry($complaint));
-        
+
         $notification = array(
             'message' => 'Complaint added successfully',
             'alert-type' => 'success',
