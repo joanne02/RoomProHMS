@@ -51,6 +51,8 @@ class ComplaintController extends Controller
     public function storeComplaint(Request $request)
     {
         $admins = User::where('usertype', 'admin')->get();
+        $staffUsers = User::where('usertype', 'staff')->get();
+
         $request->validate([
             'complaint_username' => 'required|string|max:255',
             'complaint_type' => 'required',
@@ -82,7 +84,7 @@ class ComplaintController extends Controller
         $complaint->save();
 
         $adminEmail = 'admin@example.com'; // change this to actual admin email
-        Notification::send($admins, new NewComplaintsEntry($complaint));
+        Notification::send($staffUsers, new NewComplaintsEntry($complaint));
         
         $notification = array(
             'message' => 'Complaint added successfully',
