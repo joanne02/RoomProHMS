@@ -244,7 +244,7 @@ class ApplicationController extends Controller
         }
 
         $user = $application->user;
-        // $user->notify(new ApplicationStatusUpdated('approved', $application->id));
+        $user->notify(new ApplicationStatusUpdated('approved', $application->id));
 
         $notification = array (
             'message' => 'Application status updated successfully.',
