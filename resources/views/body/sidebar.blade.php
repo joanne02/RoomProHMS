@@ -45,7 +45,8 @@
                 </li>
                 @endcan
 
-                @can('read_user')
+                {{-- @can('read_user') --}}
+                @if(auth()->user() && auth()->user()->usertype === 'superadmin')
                 <li class="nav-item">
                   <a class="nav-link" data-bs-toggle="collapse" href="#users" role="button"
                       aria-expanded="false" aria-controls="users">
@@ -65,7 +66,8 @@
                     </ul>
                   </div>
                 </li>
-                @endcan
+                @endif
+                {{-- @endcan --}}
                 
                 @can('read_room')
                 <li class="nav-item">
@@ -81,7 +83,7 @@
                   $resident_route = (isset($resident) && ($resident->usertype === 'superadmin' || $resident->usertype === 'staff'))
                       ? route('indexresident')
                       : route('mainresidentresident');
-              @endphp
+                @endphp
 
 
                 @can('read_resident')

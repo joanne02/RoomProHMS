@@ -44,7 +44,25 @@
                                 <td>{{$application->faculty}}</td>
                                 <td>{{$application->program}}</td>
                                 <td>{{$application->year_of_study}}</td>
-                                <td>{{ ucwords(str_replace('_', ' ', $application->application_status)) }}</td>
+                                @php
+                                    $now = \Carbon\Carbon::now();
+                                    $start = $acceptanceStart ? \Carbon\Carbon::parse($acceptanceStart) : null;
+                                @endphp
+
+                                <td>
+                                    @if($start && $now->gte($start) && $application->application_status === 'approved')
+                                        @if($application->acceptance === 'accepted')
+                                            <span class="badge bg-success">Accepted</span>
+                                        @elseif($application->acceptance === 'rejected')
+                                            <span class="badge bg-danger">Rejected</span>
+                                        @else
+                                            <span class="badge bg-secondary">Pending</span>
+                                        @endif
+                                    @else
+                                        <span class="badge bg-warning">Not Yet Available</span>
+                                    @endif
+                                </td>
+
                                 <td>{{ ucwords(str_replace('_', ' ', $application->acceptance)) }}</td>
                                 <td><a href="{{route('viewapplication',$application->id)}}"><i class="link-icon" data-feather="eye"></i></a> 
                                     {{-- <a href="{{route('deleteapplication',$application->id)}}" class="text-primary me-2" id="delete"><i data-feather="trash"></i></a></td> --}}

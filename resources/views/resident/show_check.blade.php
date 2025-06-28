@@ -2,7 +2,7 @@
 @section('admin')
 
 @php
-    $pageTitle = 'Resident' 
+    $pageTitle = 'Resident';
     $currentRoute = Route::currentRouteName();
     $isCheckIn = in_array($currentRoute, ['showcheckin', 'residentcheckin']);
     $pageTitle = $isCheckIn ? 'Check In' : 'Check Out';

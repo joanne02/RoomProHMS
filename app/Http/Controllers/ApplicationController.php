@@ -70,8 +70,9 @@ class ApplicationController extends Controller
         }
 
         $applications = Application::where('user_id', $user->id)->get();
+        $acceptanceStart = $active_session_id?->acceptance_start_date;
 
-        return view('application.main_application', compact('applications', 'active_session_id', 'hasApplied', 'hasAcceptOffer'));
+        return view('application.main_application', compact('applications', 'active_session_id', 'hasApplied', 'hasAcceptOffer', 'acceptanceStart'));
     }
 
     public function mainApplication($id)
@@ -299,7 +300,8 @@ class ApplicationController extends Controller
 
         // Step 2: Create Resident record
         Resident::firstOrCreate(
-            ['user_id' => $user->id],
+            ['user_id' => $user->id,
+                'semester_id' => $semesterId],
             [
                 'application_id' => $application->id,
                 'name' => $application->name,

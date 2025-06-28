@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Complaint;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Carbon\Carbon;
 
 class ComplaintFactory extends Factory
 {
@@ -27,19 +28,25 @@ class ComplaintFactory extends Factory
             'user_id'         => $user->id,
             'identify_number' => $user->user_id, // Student ID
             'name'            => $user->username ?? $this->faker->name(),
-            // 'title'           => 'Complaint ' . $this->faker->unique()->numberBetween(1, 100),
             'type'            => $this->faker->randomElement([
                 'electrical', 'water_supply', 'civil', 'security', 'furniture', 'cleanliness', 'internet', 'other_type'
             ]),
             'description'     => 'This is example complaint description for testing purpose.',
             'category'        => $category,
             'room_name'       => $roomName,
-            'appendix'        => json_encode([
-                $this->faker->imageUrl(640, 480, 'technics', true)
+            'appendix'      => json_encode([
+                'attachments/XvixEanC8j6lDqFUC87nenbvWWezqA500Xw3RTmy.png',
+                'attachments/XvixEanC8j6lDqFUC87nenbvWWezqA500Xw3RTmy.png',
+            ]),
+            'status'          => 'completed',
+            'feedback'        => json_encode([
+                [
+                    'time' => Carbon::now()->toDateTimeString(),
+                    'feedback' => 'this is example feedback for testing purpose',
+                ],
             ]),
         ];
     }
 }
-
 
 

@@ -25,5 +25,12 @@ class Resident extends Model
     {
         return $this->belongsTo(Semester::class);
     }
+    
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
 
 }

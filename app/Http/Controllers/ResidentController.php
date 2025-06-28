@@ -8,6 +8,7 @@ use App\Models\Semester;
 use App\Models\User;
 use App\Models\Room;
 use Illuminate\Support\Facades\Storage;
+use Silber\Bouncer\BouncerFacade as Bouncer;
 
 class ResidentController extends Controller
 {
@@ -26,13 +27,17 @@ class ResidentController extends Controller
             return abort(403, 'Unauthorized');
         }
 
-        $userResident = Resident::where('user_id', $user->id)->first();
+        // $userResident = Resident::where('user_id', $user->id)->first();
 
-        if (!$userResident) {
-            return redirect()->back()->with(['error', 'Resident record not found.']);
-        }
+        // if (!$userResident) {
+        //     return redirect()->back()->with('error', 'Resident record not found.');
+        // }
 
         $activeSemester = Semester::where('is_active', true)->first();
+        $userResident = Resident::where('user_id', $user->id)
+            ->where('semester_id', $activeSemester->id ?? null)
+            ->first();
+
 
         if (!$activeSemester) {
             return redirect()->back()->with(['error', 'No active semester found.']);
@@ -53,8 +58,8 @@ class ResidentController extends Controller
             ->with('room')
             ->get();
 
-            return view('resident.resident_by_house', compact('residents', 'userResident'));
-        }
+        return view('resident.resident_by_house', compact('residents', 'userResident'));
+    }
 
     public function mainResident($id)
     {
@@ -300,6 +305,62 @@ class ResidentController extends Controller
         return redirect()->route('mainresidentresident')->with($notification);
     }
 
+    // public function residentCheckOut(Request $request, $id)
+    // {
+    //     $request->validate([
+    //         'resident_check_out' => [
+    //             'required',
+    //             'date',
+    //             function ($attribute, $value, $fail) use ($id) {
+    //                 $resident = \App\Models\Resident::find($id);
+    //                 if ($resident && $resident->check_in && $value < $resident->check_in) {
+    //                     $fail('The check-out date must be after or equal to the check-in date.');
+    //                 }
+    //             },
+    //         ],
+    //     ]);
+
+    //     $userResident = Resident::findOrFail($id);
+    //     $userResident->check_out = $request->resident_check_out;
+
+    //     $userResident->save();
+
+    //     if ($userResident->room_id) {
+    //         $room = Room::find($userResident->room_id);
+
+    //         if ($room) {
+    //             // Convert string to integer before subtracting
+    //             $occupyCount = (int) $room->occupy;
+    //             $newOccupy = max(0, $occupyCount - 1); // prevent negative numbers
+
+    //             $room->occupy = (string) $newOccupy; // cast back to string if needed
+
+    //             // If room is now empty, mark it as available
+    //             if ($newOccupy === 0) {
+    //                 $room->status = 'available';
+    //             }
+
+    //             $room->save();
+    //         }
+    //     }
+
+    //     $user = $userResident->user;
+    //         if ($user) {
+    //             $user->usertype = 'user';
+    //             $user->save();
+
+    //             // Remove 'resident' role
+    //             $user->roles()->detach(); // or use Bouncer::retract() if preferred
+    //         }
+
+    //     $notification = array(
+    //         'message'=>'Check out successfully.',
+    //         'alert-type'=>'success',
+    //     );
+
+    //     return redirect()->route('mainresidentresident')->with($notification);
+    // }
+
     public function residentCheckOut(Request $request, $id)
     {
         $request->validate([
@@ -315,22 +376,35 @@ class ResidentController extends Controller
             ],
         ]);
 
-        $userResident = Resident::findOrFail($id);
-        $userResident->check_out = $request->resident_check_out;
+        $userResident = Resident::with('user', 'room')->findOrFail($id);
 
+        // Optionally check if the resident is from the active semester
+        $activeSemester = Semester::where('is_active', true)->first();
+
+        if (!$activeSemester) {
+            return redirect()->back()->with([
+                'error' => 'No active semester found.'
+            ]);
+        }
+
+        if ($userResident->semester_id !== $activeSemester->id) {
+            return redirect()->back()->with([
+                'error' => 'Resident does not belong to the active semester.'
+            ]);
+        }
+
+        // Proceed to check out
+        $userResident->check_out = $request->resident_check_out;
         $userResident->save();
 
         if ($userResident->room_id) {
-            $room = Room::find($userResident->room_id);
-
+            $room = $userResident->room;
             if ($room) {
-                // Convert string to integer before subtracting
                 $occupyCount = (int) $room->occupy;
-                $newOccupy = max(0, $occupyCount - 1); // prevent negative numbers
+                $newOccupy = max(0, $occupyCount - 1);
 
-                $room->occupy = (string) $newOccupy; // cast back to string if needed
+                $room->occupy = (string) $newOccupy;
 
-                // If room is now empty, mark it as available
                 if ($newOccupy === 0) {
                     $room->status = 'available';
                 }
@@ -339,13 +413,27 @@ class ResidentController extends Controller
             }
         }
 
-        $notification = array(
-            'message'=>'Check out successfully.',
-            'alert-type'=>'success',
-        );
+        $user = $userResident->user;
+        if ($user) {
+            $user->usertype = 'user';
+            $user->save();
 
-        return redirect()->route('mainresidentresident')->with($notification);
+            $user->roles()->detach(); // Optionally use Bouncer::retract('resident')->from($user);
+        }
+
+        Bouncer::retract('resident')->from($user);
+
+        // Assign the 'user' role
+        Bouncer::assign('user')->to($user);
+
+        $notification = [
+            'message' => 'Check out successfully for semester ' . $activeSemester->name ?? '',
+            'alert-type' => 'success',
+        ];
+
+        return redirect()->route('dashboard')->with($notification);
     }
+
 
     public function deleteResident($id)
     {

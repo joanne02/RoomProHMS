@@ -26,7 +26,7 @@ class UsersTableSeeder extends Seeder
         
         [
             'username'=> 'User1',
-            'email'=> 'user10000@example.com',
+            'email'=> 'user10000@siswa.unimas.my',
             'password'=>Hash::make('Student000#'),
             'usertype' => 'user',
             'status' => 'active'
@@ -34,7 +34,7 @@ class UsersTableSeeder extends Seeder
 
         [
             'username'=> 'Staff1',
-            'email'=> 'staff10000@example.com',
+            'email'=> 'staff10000@unimas.my',
             'password'=>Hash::make('Staff00000#'),
             'usertype' => 'staff',
             'status' => 'active'

@@ -21,7 +21,7 @@ class FacilityFactory extends Factory
             'facility_type_id' => $facilityType->id,
             'description' => 'This is example facility description for testing purpose.',
             'status' => $this->faker->randomElement(['Good', 'Under Maintenance', 'Closed']),
-            'image' => null,
+            'image' => 'assets/images/others/placeholder.jpg',
         ];
     }
 }

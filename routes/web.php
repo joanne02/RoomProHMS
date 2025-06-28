@@ -261,7 +261,7 @@ Route::controller(ComplaintController::class)->group(function(){
 
 Route::middleware('auth')->controller(ResidentController::class)->group(function () {
     Route::get('/index/userresident', 'indexResident')->name('indexresident');
-    Route::get('/main/userresident', 'mainResidentResident')->name('mainresidentresident');
+    Route::get('/main/userstudentresident', 'mainResidentResident')->name('mainresidentresident');
     Route::get('/main/{id}/userresident', 'mainResident')->name('mainresident');
     Route::get('/show/check-in/{id}/userresident', 'showCheckIn')->name('showcheckin');
     Route::get('/show/check-out/{id}/userresident', 'showCheckOut')->name('showcheckout');

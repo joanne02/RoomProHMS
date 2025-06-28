@@ -76,7 +76,5 @@ class AbilitySeeder extends Seeder
         Ability::create(['name'=>'delete_user_access', 'title' => 'Delete User Access']);
 
         Ability::create(['name'=>'allocate_room', 'title' => 'Allocate Room']);
-        
-
     }
 }

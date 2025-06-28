@@ -13,6 +13,6 @@ class ApplicationSeeder extends Seeder
      */
     public function run(): void
     {
-        Application::factory()->count(250)->create();
+        Application::factory()->count(100)->create();
     }
 }
