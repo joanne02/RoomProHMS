@@ -192,51 +192,37 @@ public function downloadQr()
 
     public function publicForm(Request $request)
     {
-        return view('visitation.public_form'); // You can reuse add_visitation or make a simpler version
+        return view('visitation.public_form', [
+            'existing' => session('existing'),
+            'contactNo' => session('contactNo'),
+            'success' => session('success'),
+        ]);
     }
 
-    // public function scanQr($visitationToken)
-    // {
-    //     $today = Carbon::now()->toDateString();
-
-    //     $existingVisitation = Visitation::where('token', $visitationToken)
-    //         ->whereDate('created_at', $today)
-    //         ->first();
-
-    //     if ($existingVisitation) {
-    //         // Show checkout form with prefilled values
-    //         return view('visitation.public_form', [
-    //             'visitationToken' => $visitationToken,
-    //             'existing' => $existingVisitation
-    //         ]);
-    //     } else {
-    //         // New visitor (check-in)
-    //         return view('visitation.public_form', [
-    //             'visitationToken' => $visitationToken,
-    //             // 'existing' => null
-    //         ]);
-    //     }
-    // }
 
     public function scanQr()
-{
-    return view('visitation.contact_prompt'); // no need to pass visitationToken
-}
-
+    {
+        return view('visitation.contact_prompt'); // no need to pass visitationToken
+    }
 
     public function storePublicVisitation(Request $request)
     {
         $request->validate([
             'visitor_name' => 'required|string|max:255',
             'visitor_contact_no' => 'required|string|max:20',
-            'visit_check_in' => 'nullable|date',
+            'visit_purpose' => 'required|string',
+            'other_visit_purpose' => 'required_if:visit_purpose,other|string|nullable',
+            'visit_description' => 'nullable|string',
+            'visit_check_in' => 'required|date',
             'visit_check_out' => 'nullable|date',
-            'visit_appendix.*' => 'file|max:2048' // optional file validation
+            'visit_appendix.*' => 'file|max:2048',
         ], [
             'visitor_name.required' => 'Please enter your full name.',
             'visitor_contact_no.required' => 'Please enter your contact number.',
-            'visit_check_in.date' => 'Check-in time must be a valid date.',
-            'visit_check_out.date' => 'Check-out time must be a valid date.',
+            'visit_purpose.required' => 'Please select the purpose of your visit.',
+            'other_visit_purpose.required_if' => 'Please specify your purpose if "Other" is selected.',
+            'visit_check_in.date' => 'Check-in must be a valid date and time.',
+            'visit_check_out.date' => 'Check-out must be a valid date and time.',
             'visit_appendix.*.max' => 'Each uploaded file must be less than 2MB.',
         ]);
 
@@ -251,7 +237,12 @@ public function downloadQr()
             $existing->check_out = $request->visit_check_out ?? now();
             $existing->save();
 
-            return redirect()->back()->with('success', 'Thank you! Your check-out was recorded.');
+            return redirect()->back()->with([
+                'message' => 'Check-in successful! Thank you for visiting.',
+                'alert-type' => 'success'
+            ]);
+
+
         } else {
             // Check-in
             $visitation = new Visitation();
@@ -262,37 +253,56 @@ public function downloadQr()
                 : $request->visit_purpose;
             $visitation->description = $request->visit_description ?? null;
             $visitation->check_in = $request->visit_check_in ?? now();
-            $visitation->token = $request->visitation_token; // still optional, or use static/default
+            // $visitation->token = $request->visitation_token;
+
+            $appendixPaths = [];
+                if ($request->hasFile('visit_appendix')) {
+                    foreach ($request->file('visit_appendix') as $file) {
+                        $filename = time() . '_' . Str::random(8) . '_' . $file->getClientOriginalName();
+                        $path = $file->storeAs('public/visit_appendix', $filename);
+                        $appendixPaths[] = $path;
+                    }
+                }
+            $visitation->appendix = $appendixPaths ? json_encode($appendixPaths) : null;
 
             $visitation->save();
 
-            return redirect()->back()->with('success', 'Thank you! Your check-in was recorded.');
+            return redirect()->back()->with([
+                'message' => 'Check-in successful! Thank you for visiting.',
+                'alert-type' => 'success'
+            ]);
+
+
         }
 
     }
 
-public function checkContact(Request $request)
-{
-    $today = Carbon::now()->toDateString();
+    public function checkContact(Request $request)
+    {
+        $today = Carbon::now()->toDateString();
 
-    if ($request->isMethod('post')) {
-        $request->validate([
-            'visitor_contact_no' => 'required|string|max:20',
-        ]);
+        if ($request->isMethod('post')) {
+            $request->validate([
+                'visitor_contact_no' => 'required|string|max:20',
+            ]);
 
-        $existing = Visitation::where('contact_no', $request->visitor_contact_no)
-            ->whereDate('created_at', $today)
-            ->first();
+            $existing = Visitation::where('contact_no', $request->visitor_contact_no)
+                ->whereDate('created_at', $today)
+                ->first();
 
-        return view('visitation.public_form', [
-            'existing' => $existing,
-            'contactNo' => $request->visitor_contact_no,
-        ])->with('success', 'Record found. You may now check in or out.');
+            return redirect()
+                ->route('visitationpublicform')
+                ->withInput($request->only('visitor_contact_no'))
+                ->with([
+                    'existing' => $existing,
+                    'contactNo' => $request->visitor_contact_no,
+                    'success' => 'Record found. You may now check in or out.',
+                ]);
+
+        }
+
+        return view('visitation.contact_prompt');
     }
-
-    return view('visitation.contact_prompt');
-}
-
 
     public function deleteVisitation($id)
     {

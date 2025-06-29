@@ -25,9 +25,9 @@
                 @endif
 
                 <!-- Display success message -->
-                @if (session('success'))
-                    <div class="alert alert-success">
-                        {{ session('success') }}
+                @if (session('message'))
+                    <div class="alert alert-{{ session('alert-type', 'info') }}">
+                        {{ session('message') }}
                     </div>
                 @endif
 
@@ -42,11 +42,17 @@
                             <label class="form-label">Name</label>
                             <input type="text" class="form-control" name="visitor_name"
                                    value="{{ old('visitor_name', $existing->name ?? '') }}" placeholder="Enter Full Name">
+                                   @error('visitor_name')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
                         </div>
                         <div class="col-sm-6 mb-3">
                             <label class="form-label">Contact No</label>
                             <input type="text" name="visitor_contact_no" class="form-control"
                             value="{{ old('visitor_contact_no', $contactNo ?? ($existing->contact_no ?? '')) }}" required>
+                        @error('visitor_contact_no')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
                         </div>
                         
                     </div>
@@ -60,6 +66,9 @@
                             <option value="official_business" {{ old('visit_purpose', $existing->purpose ?? '') == 'official_business' ? 'selected' : '' }}>Official Business</option>
                             <option value="other" {{ !in_array($existing->purpose ?? '', ['visitation','maintenance','official_business']) && isset($existing) ? 'selected' : '' }}>Other</option>
                         </select>
+                        @error('visit_purpose')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
                     </div>
 
                     <div class="mb-3" id="otherPurposeField" style="display: none;">
@@ -67,12 +76,18 @@
                         <input type="text" name="other_visit_purpose" class="form-control"
                                value="{{ old('other_visit_purpose', (!in_array($existing->purpose ?? '', ['visitation','maintenance','official_business']) && isset($existing)) ? $existing->purpose : '') }}"
                                placeholder="Specify the purpose">
-                    </div>
+                    @error('other_visit_purpose')
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
+                            </div>
 
                     <div class="mb-3">
                         <label class="form-label">Description</label>
                         <textarea class="form-control" name="visit_description" rows="3"
                                   placeholder="Enter Description of visitation">{{ old('visit_description', $existing->description ?? '') }}</textarea>
+                                  @error('visit_description')
+            <small class="text-danger">{{ $message }}</small>
+        @enderror
                     </div>
 
                     <div class="row">
@@ -80,12 +95,18 @@
                             <label class="form-label">Check In</label>
                             <input type="datetime-local" class="form-control" name="visit_check_in"
                                    value="{{ old('visit_check_in', isset($existing->check_in) ? \Carbon\Carbon::parse($existing->check_in)->format('Y-m-d\TH:i') : '') }}">
-                        </div>
+                        @error('visit_check_in')
+    <small class="text-danger">{{ $message }}</small>
+@enderror
+                                </div>
                         <div class="col-sm-6 mb-3">
                             <label class="form-label">Check Out</label>
                             <input type="datetime-local" class="form-control" name="visit_check_out"
                                    value="{{ old('visit_check_out', isset($existing->check_out) ? \Carbon\Carbon::parse($existing->check_out)->format('Y-m-d\TH:i') : '') }}">
-                        </div>
+                                   @error('visit_check_out')
+    <small class="text-danger">{{ $message }}</small>
+@enderror
+                                </div>
                     </div>
 
                     <div class="mb-3">
@@ -110,10 +131,10 @@
             function toggleOtherField() {
                 otherField.style.display = (purposeSelect.value === 'other') ? 'block' : 'none';
             }
-
             purposeSelect.addEventListener('change', toggleOtherField);
             toggleOtherField(); // trigger on page load if "other" is pre-selected
         });
     </script>
+
 </body>
 </html>

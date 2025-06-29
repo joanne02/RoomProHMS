@@ -15,6 +15,12 @@
                 <div class="alert alert-danger">{{ session('error') }}</div>
             @endif
 
+            @if (session('message'))
+                <div class="alert alert-{{ session('alert-type', 'info') }}">
+                    {{ session('message') }}
+                </div>
+            @endif
+
             <form method="POST" action="{{ route('visitation.checkContact') }}">
                 @csrf
                 {{-- <input type="hidden" name="visitation_token" value="{{ $visitationToken }}"> --}}

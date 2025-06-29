@@ -141,17 +141,22 @@
                                 <div class="col-sm-6">
                                     <div class="mb-3">
                                         <label class="form-label">Room</label>
-                                        <select class="form-select @error('resident_room_id') is-invalid @enderror" name="resident_room_id">
+                                        <select class="form-select @error('resident_room_id') is-invalid @enderror" name="resident_room_id" id="roomSelect">
                                             <option selected disabled>Select Room</option>
                                             @foreach($rooms as $room)
-                                                <option value="{{ $room->id }}">{{ $room->name }} (Block {{ $room->block }}, Floor {{ $room->floor }})</option>
+                                                <option 
+                                                    value="{{ $room->id }}" 
+                                                    data-gender="{{ $room->gender }}">
+                                                    {{ $room->name }} (Block {{ $room->block }}, Floor {{ $room->floor }})
+                                                </option>
                                             @endforeach
                                         </select>
                                         @error('resident_room_id')
                                             <span class="invalid-feedback">{{ $message }}</span>
                                         @enderror
                                     </div>
-                                </div><!-- Col -->
+                                </div>
+
                                 <div class="col-sm-6">
                                     <div class="mb-3">
                                         <label class="form-label">Contact No</label>
@@ -258,6 +263,7 @@
     </div>
 </div>
 
+@push('scripts')
 <script>
     document.getElementById('user_id').addEventListener('change', function () {
         const selectedOption = this.options[this.selectedIndex];
@@ -268,8 +274,6 @@
         document.getElementById('user_email').value = email || '';
     });
 </script>
-
-@push('scripts')
 <script>
     document.getElementById('residentImage').addEventListener('change', function(event) {
         const file = event.target.files[0];
@@ -282,6 +286,29 @@
         }
     });
 </script>
+<script>
+    document.getElementById('usergender').addEventListener('change', function () {
+        const selectedGender = this.value;
+        const roomSelect = document.getElementById('roomSelect');
+        const options = roomSelect.options;
+
+        for (let i = 0; i < options.length; i++) {
+            const option = options[i];
+            const roomGender = option.getAttribute('data-gender');
+
+            // Show all rooms that match the selected gender or are unisex
+            if (!roomGender || roomGender === selectedGender || roomGender === 'unisex') {
+                option.style.display = '';
+            } else {
+                option.style.display = 'none';
+            }
+        }
+
+        // Reset room selection
+        roomSelect.selectedIndex = 0;
+    });
+</script>
+
 @endpush
 
 
