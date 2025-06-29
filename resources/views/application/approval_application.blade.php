@@ -4,7 +4,15 @@
     $pageTitle = 'Application';
 @endphp
 <div class="page-content">
-    {{ Breadcrumbs::render('application_details', $application->session_id) }}
+    
+    
+
+    @if(auth()->user()->usertype === 'superadmin' || auth()->user()->usertype === 'staff')
+                {{-- Show breadcrumbs only if the user is superadmin or staff --}}
+                {{ Breadcrumbs::render('application_details', $application->session_id) }}
+            @else
+                {{ Breadcrumbs::render('application_details_resident', $application->session_id) }}
+            @endif
     
     <div class="row">
         <div class="col-md-12 stretch-card">

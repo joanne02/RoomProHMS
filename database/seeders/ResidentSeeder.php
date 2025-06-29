@@ -16,6 +16,7 @@ class ResidentSeeder extends Seeder
     {
         $this->updateApplicationAcceptance();
         $this->promoteAcceptedApplicantsToResidents();
+        $this->markAcceptanceNotified();
     }
 
     private function updateApplicationAcceptance(): void
@@ -104,4 +105,17 @@ class ResidentSeeder extends Seeder
             $this->command->info("Promoted {$user->email} to resident.");
         }
     }
+
+    private function markAcceptanceNotified(): void
+    {
+        Application::where('session_id', 1)
+            ->where('application_status', 'approved')
+            ->where('acceptance', 'accepted')
+            ->update(['acceptance_notified' => true]);
+
+        $this->command->info("Marked acceptance_notified = true for accepted applications.");
+    }
+
+
+
 }

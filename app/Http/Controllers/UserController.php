@@ -65,26 +65,28 @@ class UserController extends Controller
 
     public function updateFirstPassword(Request $request)
     {
-        // Ensure the user is authenticated
-        $user = Auth::user(); 
+        $user = Auth::user();
 
-        
         // Validate the new password
         $validated = $request->validate([
-            'password' => 'required|string|min:8|confirmed', // Ensure password confirmation
+            'password' => 'required|string|min:8|confirmed',
         ]);
-        
-        // // Hash the password before saving it
-        $user->password = Hash::make($validated['password']);  // Make sure to hash the password
-        $user->must_change_password = false; // Set must_change_password to false after the change
 
-        $user->save(); // Save the updated user model
-    
-        // Regenerate the session to avoid session fixation
+        // Check if the new password is the same as the old one
+        if (Hash::check($validated['password'], $user->password)) {
+            return back()->withErrors(['password' => 'New password must be different from the current password.']);
+        }
+
+        // Update the password
+        $user->password = Hash::make($validated['password']);
+        $user->must_change_password = false;
+        $user->save();
+
+        // Regenerate session
         $request->session()->regenerate();
-    
-        // Redirect to dashboard with success message
-        return redirect()->route('dashboard')->with(['success', 'Password changed successfully.']);
+
+        // Redirect with success message
+        return redirect()->route('dashboard')->with('success', 'Password changed successfully.');
     }
 
     public function editUser($id)

@@ -15,6 +15,7 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
         // $schedule->command('reject:expired-applications')->daily();
         $schedule->command('app:auto-reject-expired-acceptance')->everyMinute();
+        $schedule->command('notify:acceptance-start')->everyMinute();
     }
 
     /**
@@ -30,5 +31,6 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         // Commands\RejectExpiredApplications::class,
         Commands\AutoRejectExpiredAcceptance::class,
+        Commands\NotifyAcceptanceStart::class,
     ];
 }

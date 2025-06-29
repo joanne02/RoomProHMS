@@ -148,7 +148,7 @@ class ApplicationController extends Controller
         $application->name = $request->applicant_name;
         $application->student_id = $request->applicant_student_id;
         $application->email = $request->applicant_email;
-        $application->gender = $request->application_gender;
+        $application->gender = $request->applicant_gender;
         $application->faculty = $request->applicant_faculty;
         $application->program = $request->applicant_program;
         $application->year_of_study = $request->applicant_year_of_study;
@@ -244,8 +244,12 @@ class ApplicationController extends Controller
                 ]);
         }
 
-        $user = $application->user;
-        $user->notify(new ApplicationStatusUpdated($status, $application->id));
+        // $user = $application->user;
+        // $message = $status === 'approved'
+        //     ? 'Your hostel application has been approved. Please wait for the acceptance period to begin.'
+        //     : 'Your hostel application has been rejected. Reason: ' . ($application->rejection_reason ?? 'N/A');
+
+        // $user->notify(new ApplicationStatusUpdated($status, $application->id, $message));
 
         $notification = array (
             'message' => 'Application status updated successfully.',
@@ -310,6 +314,9 @@ class ApplicationController extends Controller
                 'contact_no' => $application->contact_no,
                 'room_id' => $application->room_id,
                 'semester_id' => $semesterId,
+                'faculty' => $application->faculty,
+                'program' => $application->program,
+                'year_of_study' => $application->year_of_study,
             ]
         );
 

@@ -14,6 +14,7 @@ class ApplicationFactory extends Factory
     /**
      * Define the model's default state.
      *
+     *
      * @return array<string, mixed>
      */
     public function definition(): array
@@ -42,6 +43,8 @@ class ApplicationFactory extends Factory
         $gender = fake()->randomElement(['male', 'female']);
         $blockOptions = $gender === 'male' ? ['C', 'D', 'E', 'F', 'G'] : ['H', 'I', 'J', 'K', 'L', 'M', 'N'];
 
+        // Determine status randomly (90% approved, 10% rejected for example)
+        $status = fake()->boolean(90) ? 'approved' : 'rejected';
         return [
             'user_id' => $user->id,
             'session_id' => $sessionId,
@@ -60,7 +63,8 @@ class ApplicationFactory extends Factory
                 'floor' => fake()->randomElement(['G', '1', '2']),
                 'room_type' => fake()->randomElement(['Single', 'Double', '4 Person']),
             ]),
-            'application_status' => fake()->boolean(10) ? 'rejected' : 'approved',
+            'application_status' => $status,
+            'acceptance' => $status === 'rejected' ? 'not_offered' : 'pending',
         ];
     }
 

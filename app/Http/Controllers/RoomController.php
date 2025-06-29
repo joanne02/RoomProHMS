@@ -19,22 +19,38 @@ class RoomController extends Controller
 
     public function storeRoom(Request $request) {
         
+        $request->merge([
+            'block_from' => strtoupper($request->block_from),
+            'block_to'   => strtoupper($request->block_to),
+            'floor_from' => strtoupper($request->floor_from),
+            'floor_to'   => strtoupper($request->floor_to),
+            'room_types' => collect($request->input('room_types'))->map(function ($type) {
+                return [
+                    'letter'   => strtoupper($type['letter']),
+                    'type'     => ucwords(strtolower($type['type'])),
+                    'capacity' => $type['capacity'],
+                ];
+            })->toArray(),
+        ]);
+
+        // Now validate with existing rules
         $request->validate([
-            'block_from' => 'required|string',
-            'block_to'   => 'required|string',
+            'block_from' => 'required|string|size:1|alpha',
+            'block_to'   => 'required|string|size:1|alpha',
             'floor_from' => 'required|string',
             'floor_to'   => 'required|string',
             'house_from' => 'required|integer',
             'house_to'   => 'required|integer',
             'room_types' => 'required|array',
-            'room_types.*.letter' => 'required|string',
-            'room_types.*.type' => 'required|string',
-            'room_types.*.capacity'  => 'required|integer',
-            ],[],[
-            'room_types.*.letter' => 'room type letter',
-            'room_types.*.type' => 'room type name',
+            'room_types.*.letter'   => 'required|string|alpha|size:1',
+            'room_types.*.type'     => 'required|string',
+            'room_types.*.capacity' => 'required|integer|min:1',
+            'room_gender'           => 'required|in:male,female',
+        ], [], [
+            'room_types.*.letter'   => 'room type letter',
+            'room_types.*.type'     => 'room type name',
             'room_types.*.capacity' => 'room type capacity',
-            'room_gender' => 'required'
+            'room_gender'           => 'room gender',
         ]);
     
         $rooms = [];

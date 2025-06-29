@@ -194,6 +194,19 @@
             </div>
         @endcan
 
+        @php
+            $now = Carbon::now();
+            $isClosed = false;
+
+            if ($active_session_id) {
+                $endDate = Carbon::parse($active_session_id->application_end_date);
+                $isClosed = $now->gt($endDate);
+            }
+
+            $showApplicationStatus = $active_session_id && $active_session_id->acceptance_start_date <= $now;
+        @endphp
+
+
             <div class="row">
                 <div class="col-md-12 grid-margin stretch-card">
                     <div class="card">
@@ -224,7 +237,15 @@
                                     <td>{{$application->faculty}}</td>
                                     <td>{{ ucwords(str_replace('_', ' ', $application->program)) }}</td>
                                     <td>{{$application->year_of_study}}</td>
-                                    <td>{{ ucwords(str_replace('_', ' ', $application->application_status)) }}</td>
+                                    {{-- <td>{{ ucwords(str_replace('_', ' ', $application->application_status)) }}</td> --}}
+                                    @if ($showApplicationStatus)
+                                        <td>{{ ucwords(str_replace('_', ' ', $application->application_status)) }}</td>
+                                    @else
+                                        <td>
+                                            Pending
+                                        </td>
+                                    @endif
+
                                     <td>{{ ucwords(str_replace('_', ' ', $application->acceptance)) }}</td>
                                     <td>
                                         {{-- <a href="{{route('viewapplication',$application->id)}}"><i class="link-icon" data-feather="eye"></i></a> 

@@ -4,7 +4,6 @@
 @php
     $pageTitle = 'Room'
 @endphp
-  
 
 <div class="page-content">
     {{ Breadcrumbs::render('add_room') }}
@@ -190,96 +189,89 @@
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    let index = 1;
+    document.addEventListener("DOMContentLoaded", function () {
+        let index = 1;
 
-    // Add Room Type dynamically
-    document.getElementById("add-room-type").addEventListener("click", function () {
-        let container = document.getElementById("room-types-container");
-        let newEntry = document.createElement("div");
-        newEntry.classList.add("room-type-entry", "row", "mt-2");
+        // Add Room Type dynamically
+        document.getElementById("add-room-type").addEventListener("click", function () {
+            let container = document.getElementById("room-types-container");
+            let newEntry = document.createElement("div");
+            newEntry.classList.add("room-type-entry", "row", "mt-2");
 
-        newEntry.innerHTML = `
-            <div class="col-md-4">
-                <input type="text" name="room_types[${index}][letter]" class="form-control" placeholder="Room Letter (A, B, C)">
-            </div>
-            <div class="col-md-4">
-                <input type="text" name="room_types[${index}][type]" class="form-control" placeholder="Room Type (Single, Double)">
-            </div>
-            <div class="col-md-3">
-                <input type="number" name="room_types[${index}][capacity]" class="form-control" placeholder="Capacity">
-            </div>
-            <div class="col-md-1">
-                <button type="button" class="btn btn-danger remove-room-type">Delete</button>
-            </div>
-        `;
+            newEntry.innerHTML = `
+                <div class="col-md-4">
+                    <input type="text" name="room_types[${index}][letter]" class="form-control" placeholder="Room Letter (A, B, C)">
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="room_types[${index}][type]" class="form-control" placeholder="Room Type (Single, Double)">
+                </div>
+                <div class="col-md-3">
+                    <input type="number" name="room_types[${index}][capacity]" class="form-control" placeholder="Capacity">
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-danger remove-room-type">Delete</button>
+                </div>
+            `;
 
-        container.appendChild(newEntry);
-        index++;
-    });
+            container.appendChild(newEntry);
+            index++;
+        });
 
-    // Remove Room Type
-    document.getElementById("room-types-container").addEventListener("click", function (event) {
-        if (event.target.classList.contains("remove-room-type")) {
-            event.target.closest(".room-type-entry").remove();
+        // Remove Room Type
+        document.getElementById("room-types-container").addEventListener("click", function (event) {
+            if (event.target.classList.contains("remove-room-type")) {
+                event.target.closest(".room-type-entry").remove();
+            }
+        });
+
+        
+        document.querySelector('form').addEventListener('submit', function (e) {
+        const isValid = validateRoomTypes();
+        if (!isValid) {
+            e.preventDefault(); // Stop form submission
         }
+        });
     });
 
-    
-    document.querySelector('form').addEventListener('submit', function (e) {
-    const isValid = validateRoomTypes();
-    if (!isValid) {
-        e.preventDefault(); // Stop form submission
+    function validateRoomTypes() {
+        let isValid = true;
+
+        // Select all room type groups
+        const roomLetters = document.querySelectorAll('input[name^="room_types"][name$="[letter]"]');
+        const roomTypes = document.querySelectorAll('input[name^="room_types"][name$="[type]"]');
+        const roomCapacities = document.querySelectorAll('input[name^="room_types"][name$="[capacity]"]');
+
+        // Loop through each group of inputs
+        for (let i = 0; i < roomLetters.length; i++) {
+            const letter = roomLetters[i];
+            const type = roomTypes[i];
+            const capacity = roomCapacities[i];
+
+            // Clear previous error styles
+            [letter, type, capacity].forEach(input => input.classList.remove('is-invalid'));
+
+            // Validate letter (e.g., A, B, C)
+            if (!/^[A-Z]$/.test(letter.value.trim())) {
+                letter.classList.add('is-invalid');
+                isValid = false;
+            }
+
+            // Validate type (not empty)
+            if (type.value.trim() === '') {
+                type.classList.add('is-invalid');
+                isValid = false;
+            }
+
+            // Validate capacity (positive number)
+            const capVal = parseInt(capacity.value.trim());
+            if (isNaN(capVal) || capVal <= 0) {
+                capacity.classList.add('is-invalid');
+                isValid = false;
+            }
+        }
+
+        return isValid;
     }
-    });
-});
-
-    // const oldRoomTypes = @json(old('room_types', []));
-
-    // oldRoomTypes.forEach((room, index) => {
-    //     addRoomTypeInput(room.letter, room.type, room.capacity, index); // your custom JS function
-    // });
-
-
-function validateRoomTypes() {
-    let isValid = true;
-
-    // Select all room type groups
-    const roomLetters = document.querySelectorAll('input[name^="room_types"][name$="[letter]"]');
-    const roomTypes = document.querySelectorAll('input[name^="room_types"][name$="[type]"]');
-    const roomCapacities = document.querySelectorAll('input[name^="room_types"][name$="[capacity]"]');
-
-    // Loop through each group of inputs
-    for (let i = 0; i < roomLetters.length; i++) {
-        const letter = roomLetters[i];
-        const type = roomTypes[i];
-        const capacity = roomCapacities[i];
-
-        // Clear previous error styles
-        [letter, type, capacity].forEach(input => input.classList.remove('is-invalid'));
-
-        // Validate letter (e.g., A, B, C)
-        if (!/^[A-Z]$/.test(letter.value.trim())) {
-            letter.classList.add('is-invalid');
-            isValid = false;
-        }
-
-        // Validate type (not empty)
-        if (type.value.trim() === '') {
-            type.classList.add('is-invalid');
-            isValid = false;
-        }
-
-        // Validate capacity (positive number)
-        const capVal = parseInt(capacity.value.trim());
-        if (isNaN(capVal) || capVal <= 0) {
-            capacity.classList.add('is-invalid');
-            isValid = false;
-        }
-    }
-
-    return isValid;
-}
 
 </script>
 

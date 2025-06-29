@@ -39,6 +39,12 @@ Breadcrumbs::for('application_details', function (BreadcrumbTrail $trail, $id) {
     $trail->push('Application Details', route('viewapplication', ['id' => $id]));
 });
 
+//Dashboard > Application > Application Details
+Breadcrumbs::for('application_details_resident', function (BreadcrumbTrail $trail, $id) {
+    $trail->parent('main_application');
+    $trail->push('Application Details', route('viewapplication', ['id' => $id]));
+});
+
 //Dashboard > Facility
 Breadcrumbs::for('facility', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');

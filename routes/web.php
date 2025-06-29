@@ -307,7 +307,7 @@ Route::post('/run-room-allocation', function (Request $request) {
 
     Log::info("📦 Dispatching job with session ID {$sessionId} and chunk number: {$chunkNumber}");
 
-    // ✅ Get or create status record for this session + chunk
+    //Get or create status record for this session + chunk
     $status = AllocationStatus::firstOrNew([
         'session_id' => $sessionId,
         'chunk_number' => $chunkNumber,
@@ -318,12 +318,12 @@ Route::post('/run-room-allocation', function (Request $request) {
     }
 
     try {
-        $status->chunk_number = $chunkNumber; // ✅ explicitly set it
+        $status->chunk_number = $chunkNumber; //explicitly set it
         $status->is_running = true;
         $status->is_confirmed = false;
         $status->save();
 
-        // ✅ Dispatch with chunk number
+        //Dispatch with chunk number
         dispatch(new RunRoomAllocationGA($sessionId, $chunkNumber, auth()->user()))
             ->onQueue('room-allocation')
             ->delay(now()->addSeconds(5)); // Optional: delay the job by 5 seconds
@@ -343,7 +343,7 @@ Route::post('/run-room-allocation', function (Request $request) {
 
 Route::post('/confirm-allocation', function (Request $request) {
     $sessionId = $request->input('session_id');
-    $chunkNumber = $request->input('chunk_number'); // ✅
+    $chunkNumber = $request->input('chunk_number'); //
 
     $status = AllocationStatus::where('session_id', $sessionId)
                               ->where('chunk_number', $chunkNumber)

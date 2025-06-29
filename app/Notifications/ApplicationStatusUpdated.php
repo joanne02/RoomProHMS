@@ -12,15 +12,17 @@ class ApplicationStatusUpdated extends Notification
     use Queueable;
 
     protected $status;
-
     protected $applicationId;
+    protected $customMessage;
+
     /**
      * Create a new notification instance.
      */
-    public function __construct($status, $applicationId)
+    public function __construct($status, $applicationId, $customMessage = null)
     {
         $this->status = $status;
         $this->applicationId = $applicationId;
+        $this->customMessage = $customMessage;
     }
 
     /**
@@ -38,12 +40,20 @@ class ApplicationStatusUpdated extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
-            ->subject('Hostel Application Status Updated')
-            ->greeting('Hi ' . $notifiable->username . ',')
-            ->line('Your hostel application status has been updated.')
-            ->line('**Status:** ' . ucfirst($this->status))
-            ->line('Thank you for using our Hostel Management System!');
+        $message = (new MailMessage)
+            ->subject('Hostel Application Notification')
+            ->greeting('Hi ' . $notifiable->username . ',');
+
+        if ($this->customMessage) {
+            $message->line($this->customMessage);
+        } else {
+            $message->line('**Status:** ' . ucfirst($this->status));
+        }
+
+        $message->action('View Application', route('mainresidentapplication'))
+                ->line('Thank you for using our Hostel Management System!');
+
+        return $message;
     }
 
     /**
@@ -55,7 +65,8 @@ class ApplicationStatusUpdated extends Notification
     {
         return [
             'status' => $this->status,
-            'message' => 'Your hostel application status has been updated to ' . ucfirst($this->status),
+            'message' => $this->customMessage
+                ?? 'Your hostel application status has been updated to ' . ucfirst($this->status),
             'url' => route('mainresidentapplication'),
         ];
     }

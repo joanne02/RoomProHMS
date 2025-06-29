@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('application_id')->constrained()->onDelete('cascade');
             $table->string('name')->nullable();
             $table->string('student_id')->nullable();
-            $table->foreignId('room_id')->constrained()->onDelete('cascade');
+            $table->foreignId('room_id')->nullable()->constrained()->onDelete('set null');
             $table->string('room_name')->nullable();
             $table->string('email')->nullable();
             $table->string('contact_no')->nullable();
