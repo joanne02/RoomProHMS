@@ -104,7 +104,7 @@ class RunRoomAllocationGA implements ShouldQueue
                 $overallMatch = $this->calculateOverallMatch($bestSolution, $applications, $rooms, $preferenceMap);
                 $currentFitness = $this->calculateFitness($bestSolution, $applications, $rooms, $preferenceMap);
 
-                Log::info("🧬 Gen $g — Chunk {$this->chunkNumber} — Match: {$overallMatch}%, Fitness: $currentFitness");
+                Log::info("Gen $g — Chunk {$this->chunkNumber} — Match: {$overallMatch}%, Fitness: $currentFitness");
 
                 if ($overallMatch >= 70 || ($lastBestFitness === $currentFitness && ++$stagnantCount >= $stagnationLimit)) {
                     break;
@@ -193,7 +193,7 @@ class RunRoomAllocationGA implements ShouldQueue
                 )
             );
 
-            Log::info("📬 Notification sent to user: {$this->triggeredBy->id}");
+            Log::info("Notification sent to user: {$this->triggeredBy->id}");
 
 
         } catch (\Throwable $e) {

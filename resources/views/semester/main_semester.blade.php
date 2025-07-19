@@ -1,7 +1,7 @@
 @extends('admin.admin_dashboard')
 @section('admin')
 @php
-    $pageTitle = 'Facility';
+    $pageTitle = 'Semester';
 @endphp
 <div class="page-content">
         <div class="d-flex justify-content-between align-items-center">

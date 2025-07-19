@@ -295,7 +295,7 @@ Route::controller(SemesterController::class)->group(function () {
 Route::post('/run-room-allocation', function (Request $request) {
     $validator = Validator::make($request->all(), [
         'session_id' => 'required|integer|exists:application_sessions,id',
-        'chunk_number' => 'required|integer|min:1', // ✅ validate chunk number
+        'chunk_number' => 'required|integer|min:1', //validate chunk number
     ]);
 
     if ($validator->fails()) {
@@ -305,7 +305,7 @@ Route::post('/run-room-allocation', function (Request $request) {
     $sessionId = $request->input('session_id');
     $chunkNumber = $request->input('chunk_number');
 
-    Log::info("📦 Dispatching job with session ID {$sessionId} and chunk number: {$chunkNumber}");
+    Log::info("Dispatching job with session ID {$sessionId} and chunk number: {$chunkNumber}");
 
     //Get or create status record for this session + chunk
     $status = AllocationStatus::firstOrNew([
