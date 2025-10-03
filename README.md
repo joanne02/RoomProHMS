@@ -26,7 +26,7 @@
 ## 🛠️ Technologies Used
 - **Backend**: Laravel (PHP)
 - **Database**: MySQL
-- **Frontend**: Blade, Bootstrap, jQuery
+- **Frontend**: Blade, Bootstrap, CSS, javascript
 - **Authentication & Authorization**: Laravel Bouncer
 - **Task Queue**: Laravel Workers
 - **Algorithm**: Genetic Algorithm (for room allocation)
@@ -45,11 +45,3 @@
 2. **Room Allocation**
    - Optimized assignments through a **Genetic Algorithm**
    - Batch processing (50 applications per run) for performance  
-
----
-
-## 🚀 Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/hostel-management-system.git
-   cd hostel-management-system
