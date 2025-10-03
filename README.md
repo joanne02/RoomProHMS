@@ -26,7 +26,7 @@
 ## 🛠️ Technologies Used
 - **Backend**: Laravel (PHP)
 - **Database**: MySQL
-- **Frontend**: Blade, Bootstrap, CSS, javascript
+- **Frontend**: Blade, Bootstrap, CSS, JavaScript
 - **Authentication & Authorization**: Laravel Bouncer
 - **Task Queue**: Laravel Workers
 - **Algorithm**: Genetic Algorithm (for room allocation)
