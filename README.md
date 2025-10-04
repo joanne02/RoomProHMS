@@ -20,7 +20,7 @@
   - Uses a **Genetic Algorithm** to optimize room assignments based on applicant preferences
   - Processes applications in **batches of 50** for efficiency
 - **Background Job Processing** with Laravel Workers for time-consuming tasks (e.g., room allocation)
-
+- **Cron Jobs**: Automates scheduled tasks such as closing application periods and sending system notifications
 ---
 
 ## 🛠️ Technologies Used
